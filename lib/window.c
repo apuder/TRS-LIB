@@ -132,7 +132,8 @@ void wnd_print(window_t* wnd, const char* fmt, ...) {
     from = p = get_screen_pos(wnd);
   
     while (str != next) {
-      *p++ = *str++;
+      *p++ = SCREEN_TO_UC(screen.is_uc, *str);
+      str++;
       wnd->cx++;
     }
     screen_update_range(from, p);
@@ -253,7 +254,7 @@ void wnd_popup(const char* fmt, ...) {
     if (x == 0 || x == len - 1) {
       *p1 = 191;
     } else {
-      *p1 = msg[x - 1];
+      *p1 = SCREEN_TO_UC(screen.is_uc, msg[x - 1]);
     }
     p1++;
   }
