@@ -4,9 +4,16 @@
 
 #include "defs.h"
 
-void out(uint8_t port, uint8_t val);
-uint8_t in(uint8_t port);
-void out31(uint8_t val);
-uint8_t in31();
+__sfr __at 0x1f TRS_IO_PORT;
+
+inline void out31(uint8_t val)
+{
+  TRS_IO_PORT = val;
+}
+
+inline uint8_t in31()
+{
+  return TRS_IO_PORT;
+}
 
 #endif

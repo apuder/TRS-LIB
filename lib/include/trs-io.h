@@ -6,8 +6,6 @@
 
 extern int16_t trs_io_err;
 
-#define TRS_IO_PORT 31
-
 #define TRS_IO_CORE_MODULE_ID 0
 
 #define TRS_IO_SEND_VERSION 0

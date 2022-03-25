@@ -5,6 +5,7 @@
 
 int16_t trs_io_err;
 
+__sfr __at 0xe0 PORT_0xE0;
 
 static inline bool is_m3()
 {
@@ -14,7 +15,7 @@ static inline bool is_m3()
 void wait_for_esp()
 {
   if (is_m3()) {
-    while (in(0xe0) & 8) ;
+    while (PORT_0xE0 & 8) ;
   } else {
     while (*((uint8_t*) 0x37e0) & 0x20) ;
   }

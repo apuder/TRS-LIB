@@ -15,7 +15,6 @@ OBJS = \
   font.rel \
 	printf.rel \
 	key.rel \
-	inout.rel \
 	trs-io.rel \
 	trs-nic.rel \
 	trs-fs.rel \
