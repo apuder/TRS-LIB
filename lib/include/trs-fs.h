@@ -43,6 +43,7 @@ typedef enum {
 #define	FA_OPEN_ALWAYS		0x10
 #define	FA_OPEN_APPEND		0x30
 
+const char* trs_fs_get_error(int error);
 int8_t trs_fs_open(const char* path, uint8_t mode);
 int8_t trs_fs_read(uint8_t fd, void* buf, uint16_t bytes_to_read, uint16_t* bytes_read);
 int8_t trs_fs_write(uint8_t fd, void* buf, uint16_t bytes_to_write, uint16_t* bytes_written);
