@@ -1,12 +1,17 @@
 
 #include "header.h"
 #include "form.h"
+#include "trs-io.h"
 #include "screen.h"
 #include <string.h>
 #include <assert.h>
 
 
 static window_t* wnd;
+
+
+static const char* left_brace = NULL;
+static const char* right_brace = NULL;
 
 
 static void draw_input_field(form_input_t* inp, bool has_focus) {
@@ -26,10 +31,8 @@ static void draw_input_field(form_input_t* inp, bool has_focus) {
     } else if (len <= width) {
       wnd_print(wnd, inp->buf);
     } else {
-      char buf[2] = {0, 0};
       for (i = 0; i < width - 3; i++) {
-        buf[0] = inp->buf[i];
-        wnd_print(wnd, buf);
+        wnd_print(wnd, "%c", inp->buf[i]);
       }
       wnd_print(wnd, "...");
     }
@@ -37,7 +40,7 @@ static void draw_input_field(form_input_t* inp, bool has_focus) {
     return;
   }
   
-  wnd_print(wnd, "[");
+  wnd_print(wnd, left_brace);
   idx = (len > width) ? len - width : 0;
   wnd_print(wnd, inp->buf + idx);
   wnd_print(wnd, FORM_CURSOR);
@@ -45,15 +48,16 @@ static void draw_input_field(form_input_t* inp, bool has_focus) {
     wnd_print(wnd, ".");
   }
   if (len < width) {
-    wnd_print(wnd, "]");
+    wnd_print(wnd, right_brace);
   }
 }
 
 static void draw_checkbox_field(form_checkbox_t* cb, bool has_focus)
 {
-  wnd_print(wnd, has_focus ? "[" : " ");
+  wnd_print(wnd, has_focus ? left_brace : " ");
   wnd_print(wnd, *cb->checked ? "Yes" : "No");
-  wnd_print(wnd, has_focus ? "] " : "  ");
+  wnd_print(wnd, has_focus ? right_brace : " ");
+  wnd_print(wnd, " ");
 }
 
 static void draw_select_field_items(form_select_t* sel)
@@ -70,9 +74,10 @@ static void draw_select_field_items(form_select_t* sel)
       continue;
     }
     frame = current == *sel->selected;
-    wnd_print(wnd, frame ? "[" : " ");
+    wnd_print(wnd, frame ? left_brace : " ");
     wnd_print(wnd, item);
-    wnd_print(wnd, frame ? "] " : "  ");
+    wnd_print(wnd, frame ? right_brace : " ");
+    wnd_print(wnd, " ");
     current++;
   } while (current != sel->first);
 }
@@ -111,6 +116,14 @@ static void redraw_form_item(form_t* form, uint8_t n, form_item_t* item, bool ha
 static void redraw_form(form_t* form) {
   int n = form->top_row;
   form_item_t* items = form->form_items;
+
+  if (left_brace == NULL) {
+    left_brace = is_m3() ? "[" : "<";
+  }
+
+  if (right_brace == NULL) {
+    right_brace = is_m3() ? "]" : ">";
+  }
 
   while (items->type != FORM_TYPE_END) {
     redraw_form_item(form, n, items, false);

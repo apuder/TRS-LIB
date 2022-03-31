@@ -36,15 +36,15 @@
 
 init:
 	;; Set stack pointer directly above top of memory.
-	ld (_sp),sp
-	ld	sp,#0x0000
+	ld	(_sp),sp
+	ld	sp,#0xf000
 
 	;; Initialise global variables
 	call	gsinit
 	call	_main
-	ld sp,(_sp)
+	ld	sp,(_sp)
 	ret
-_sp: .dw 0
+_sp:	.dw 0
 
 	;; Ordering of segments for the linker.
 	.area	_HOME

@@ -12,8 +12,7 @@ OBJS = \
 	header.rel \
 	list.rel \
 	menu.rel \
-  font.rel \
-	printf.rel \
+	font.rel \
 	key.rel \
 	trs-io.rel \
 	trs-nic.rel \

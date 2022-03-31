@@ -7,10 +7,16 @@ SCREEN screen;
 
 
 #ifndef ESP_PLATFORM
+
+#define POKE(a, b) *((volatile uint8_t*) (a)) = (b)
+#define PEEK(a) *((volatile uint8_t*) (a))
+
 static uint8_t screen_original_content[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 void init_trs_lib()
 {
+  uint8_t ch;
+
   // Hardcoded for M1/MIII
   static uint8_t background_buffer[SCREEN_WIDTH * SCREEN_HEIGHT];
 
@@ -18,10 +24,19 @@ void init_trs_lib()
   set_screen(SCREEN_BASE, background_buffer,
 	     SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  // Determine if the screen has lowercase by writing/reading screen memory.
-  // An unmodified M1 will read back 32 instead of 96.
-  *(volatile uint8_t *)SCREEN_BASE = 96;
-  screen.is_uc = *(volatile uint8_t *)SCREEN_BASE != 96;
+  screen.is_uc = false;
+
+  if (!is_m3()) {
+    // Enable BREAK key on L2/DOS
+    POKE(16396, 201);
+    
+    // Determine if the screen has lowercase by writing/reading screen memory.
+    // An unmodified M1 will read back 32 instead of 96.
+    ch = PEEK(SCREEN_BASE);
+    POKE(SCREEN_BASE, 96);
+    screen.is_uc = PEEK(SCREEN_BASE) != 96;
+    POKE(SCREEN_BASE, ch);
+  }
 }
 
 void exit_trs_lib()

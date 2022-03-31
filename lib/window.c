@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-int __vsprintf(char *buf, const char *fmt, va_list argp);
-
 
 static const uint8_t scroll_increment = 5;
 
@@ -65,7 +63,7 @@ void wnd_print(window_t* wnd, const char* fmt, ...) {
   char* str;
 
   va_start(argp, fmt);
-  __vsprintf(buf, fmt, argp);
+  vsprintf(buf, fmt, argp);
   va_end(argp);
 
   str = buf;

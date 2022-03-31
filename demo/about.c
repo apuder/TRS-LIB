@@ -6,8 +6,6 @@ static window_t wnd;
 
 void about()
 {
-  void* p1;
-  void* p2;
   set_screen_to_background();
   init_window(&wnd, 0, 3, 0, 0);
   header("About TRS-LIB");
