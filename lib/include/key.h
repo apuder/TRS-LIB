@@ -15,5 +15,6 @@ typedef char (*get_key_t)();
 
 void set_keyboard_callback(get_key_t get_key);
 char get_key();
+char scan_key();
 
 #endif

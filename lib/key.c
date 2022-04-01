@@ -30,4 +30,13 @@ char get_key() {
   __endasm;
 }
 
+char scan_key() {
+  __asm
+    push de
+    call 0x002b
+    pop de
+    ld l,a
+  __endasm;
+}
+
 #endif
