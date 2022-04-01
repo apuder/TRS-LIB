@@ -23,7 +23,7 @@ static menu_t main_menu = {
 };
 
 
-void main() {
+int main() {
   bool show_from_left = false;
   uint8_t status;
   
@@ -52,4 +52,6 @@ void main() {
   }
 
   exit_trs_lib();
+
+  return 0;
 }

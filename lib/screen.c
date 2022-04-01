@@ -1,5 +1,6 @@
 
 #include "screen.h"
+#include "trs-io.h"
 
 static const uint8_t scroll_increment = 5;
 
@@ -12,6 +13,8 @@ SCREEN screen;
 #define PEEK(a) *((volatile uint8_t*) (a))
 
 static uint8_t screen_original_content[SCREEN_WIDTH * SCREEN_HEIGHT];
+
+static uint8_t break_key;
 
 void init_trs_lib()
 {
@@ -28,7 +31,8 @@ void init_trs_lib()
 
   if (!is_m3()) {
     // Enable BREAK key on L2/DOS
-    POKE(16396, 201);
+    break_key = PEEK(0x400c);
+    POKE(0x400c, 0xc9);
     
     // Determine if the screen has lowercase by writing/reading screen memory.
     // An unmodified M1 will read back 32 instead of 96.
@@ -41,6 +45,10 @@ void init_trs_lib()
 
 void exit_trs_lib()
 {
+  if (!is_m3()) {
+    // Reset BREAK key on M1
+    POKE(0x400c, break_key);
+  }
   set_screen_to_background();
   memmove(screen.current, screen_original_content, SCREEN_WIDTH * SCREEN_HEIGHT);
   screen_show(true);

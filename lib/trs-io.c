@@ -9,7 +9,7 @@ __sfr __at 0xe0 PORT_0xE0;
 
 bool is_m3()
 {
-  return *((uint8_t*) 0x125) == 'I';
+  return *((volatile uint8_t*) 0x125) == 'I';
 }
 
 void wait_for_esp()

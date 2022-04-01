@@ -36,15 +36,29 @@
 
 init:
 	;; Set stack pointer directly above top of memory.
-	ld	(_sp),sp
-	ld	sp,#0xf000
+	ld	(sp_save),sp
+	ld	a,(0x125)
+	sub	#'I'
+	jr	z,is_m3
+	ld	sp,(0x4049)	; Highest memory for the M1
+	jr	cont
+is_m3:	ld	sp,(0x4411)	; Highest memory for the M3
+cont:	inc	sp
 
 	;; Initialise global variables
 	call	gsinit
 	call	_main
-	ld	sp,(_sp)
-	ret
-_sp:	.dw 0
+	push	de
+	pop	hl
+	ld	sp,(sp_save)
+	ld	a,e
+	or	d
+	jr	z,ok
+	jp	0x4030
+ok:	jp	0x402d
+
+sp_save:
+	.dw	0
 
 	;; Ordering of segments for the linker.
 	.area	_HOME
