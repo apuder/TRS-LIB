@@ -48,8 +48,8 @@ cont:	inc	sp
 	;; Initialise global variables
 	call	gsinit
 	call	_main
-	push	de
-	pop	hl
+	push	hl
+	pop	de
 	ld	sp,(sp_save)
 	ld	a,e
 	or	d

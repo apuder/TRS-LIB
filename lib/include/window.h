@@ -18,6 +18,7 @@ typedef struct {
 void init_window(window_t* wnd, uint8_t x, uint8_t y, int8_t w, int8_t h);
 void wnd_set_clip_line(window_t* wnd, bool flag);
 void wnd_set_clip_window(window_t* wnd, bool flag);
+void wnd_print_str(window_t* wnd, const char* str);
 void wnd_print(window_t* wnd, const char* fmt, ...);
 void wnd_cls(window_t* wnd);
 void wnd_clear_eol(window_t* wnd);

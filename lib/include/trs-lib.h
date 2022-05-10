@@ -4,6 +4,7 @@
 
 #include "defs.h"
 #include "screen.h"
+#include "inout.h"
 #include "key.h"
 #include "window.h"
 #include "header.h"
