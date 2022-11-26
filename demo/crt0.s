@@ -35,15 +35,27 @@
 	.globl  s__INITIALIZED
 
 init:
-	;; Set stack pointer directly above top of memory.
+	;; For M4, turn on MIII memory map. NOP on a M1/III
+	xor	a
+	out	(0x84), a
+
+	;; Determine the highest memory address for the stack
 	ld	(sp_save),sp
 	ld	a,(0x125)
 	sub	#'I'
 	jr	z,is_m3
-	ld	sp,(0x4049)	; Highest memory for the M1
+	ld	hl,(0x4049)	; Highest memory for the M1
 	jr	cont
-is_m3:	ld	sp,(0x4411)	; Highest memory for the M3
-cont:	inc	sp
+is_m3:
+	ld	hl,(0x4411)	; Highest memory for the M3
+cont:
+	inc	hl
+	ld	a,#0x80
+	and	h
+	jr	nz,cont1
+	ld	hl,#0 ; SP was pointing below 0x8000
+cont1:
+	ld	sp,hl
 
 	;; Initialise global variables
 	call	gsinit
