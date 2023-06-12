@@ -2,6 +2,8 @@
 #ifndef __INOUT_H__
 #define __INOUT_H__
 
+#ifndef ESP_PLATFORM
+
 #include "defs.h"
 
 __sfr __at 0x1f TRS_IO_PORT;
@@ -24,4 +26,5 @@ inline void set_m3_mem_map()
   M3_MEM_MAP = 0;
 }
 
+#endif
 #endif

@@ -25,12 +25,10 @@ typedef struct {
 
 extern SCREEN screen;
 
-void init_trs_lib();
-void exit_trs_lib();
 void set_screen(uint8_t* screen_base,
-		uint8_t* background,
-		uint8_t width, uint8_t height);
-void set_screen_callback(screen_update_range_t screen_update_range);
+                uint8_t* background,
+                uint8_t width, uint8_t height,
+                screen_update_range_t screen_update_range);
 void set_screen_to_foreground();
 void set_screen_to_background();
 void screen_show(bool from_left);

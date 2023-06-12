@@ -6,8 +6,6 @@
 #include <stdarg.h>
 
 
-static const uint8_t scroll_increment = 5;
-
 static uint8_t* get_screen_pos0(window_t* wnd, uint8_t x, uint8_t y) {
   return (screen.current + (wnd->y + y) * screen.width +
 		     (wnd->x + x));

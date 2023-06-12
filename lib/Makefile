@@ -6,6 +6,7 @@ CFLAGS = -mz80 --std-sdcc11 --opt-code-size -Iinclude
 ASFLAGS = -l
 
 OBJS = \
+	init.rel \
 	screen.rel \
 	window.rel \
 	form.rel \
