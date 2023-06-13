@@ -20,29 +20,28 @@
 #define FORM_CURSOR "\260"
 
 #define FORM_ITEM_HEADER(l) { .type = FORM_TYPE_HEADER, .label = l }
-#define FORM_ITEM_CHECKBOX(l, c, d)	{ .type = FORM_TYPE_CHECKBOX, .label = l, .dirty = d, .u.checkbox.checked = c}
-#define FORM_ITEM_SELECT(l, sel, it, d) { .type = FORM_TYPE_SELECT, .label = l, .dirty = d, .u.select.selected = sel, .u.select.items = it}
-#define FORM_ITEM_INPUT(l, b, n, w, d) { .type = FORM_TYPE_INPUT, .label = l, .dirty = d, .u.input.len = n, .u.input.buf = b, .u.input.width = w }
 #define FORM_ITEM_END { .type = FORM_TYPE_END }
+
+#define FORM_ITEM_CHECKBOX(l, c, d)	{ .type = FORM_TYPE_CHECKBOX, .label = l, .dirty = d, .u = {.checkbox = {.checked = c}}}
+#define FORM_ITEM_SELECT(l, sel, it, d) { .type = FORM_TYPE_SELECT, .label = l, .dirty = d, .u = {.select = {.first = 0, .selected = sel, .items = it}}}
+#define FORM_ITEM_INPUT(l, b, n, w, d) { .type = FORM_TYPE_INPUT, .label = l, .dirty = d, .u = { .input = {.buf = b, .len = n, .width = w }}}
 
 struct _form_t;
 
 typedef struct {
-  uint8_t width;
-  uint8_t len;
   char* buf;
+  uint8_t len;
+  uint8_t width;
 } form_input_t;
 
 typedef struct {
   bool* checked;
 } form_checkbox_t;
 
-typedef const char* ptr[];
-
 typedef struct {
   int8_t first; // Used internally. Not a parameter
   uint8_t* selected;
-  ptr* items;
+  const char** items;
 } form_select_t;
 
 typedef struct {

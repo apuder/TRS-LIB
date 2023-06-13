@@ -21,7 +21,7 @@ static form_item_t my_form_items[] = {
 	FORM_ITEM_HEADER("SECTION 1:"),
 	FORM_ITEM_CHECKBOX("First option", &option_1, NULL),
 	FORM_ITEM_CHECKBOX("Second option", &option_2, NULL),
-	FORM_ITEM_SELECT("Screen color", &screen_color, &screen_color_items, NULL),
+	FORM_ITEM_SELECT("Screen color", &screen_color, screen_color_items, NULL),
 	FORM_ITEM_HEADER(""),
 	FORM_ITEM_HEADER("SECTION 2:"),
 	FORM_ITEM_CHECKBOX("Third option", &option_3, NULL),
