@@ -60,38 +60,44 @@ static void draw_checkbox_field(form_checkbox_t* cb, bool has_focus)
   wnd_print(wnd, " ");
 }
 
-static void draw_select_field_items(form_select_t* sel)
+static void draw_select_field_items(form_select_t* sel, uint8_t width)
 {
-  uint8_t current = sel->first;
+  const uint8_t selected = sel->current;
+  uint8_t left = sel->items_str_left;
+  const uint8_t item_left = sel->items_start_idx[selected];
+  const uint8_t item_right = sel->items_end_idx[selected];
 
-  do {
-    const char* item;
-    bool frame;
-    
-    item = sel->items[current];
-    if (item == NULL) {
-      current = 0;
-      continue;
-    }
-    frame = current == *sel->selected;
-    wnd_print(wnd, frame ? left_brace : " ");
-    wnd_print(wnd, item);
-    wnd_print(wnd, frame ? right_brace : " ");
-    wnd_print(wnd, " ");
-    current++;
-  } while (current != sel->first);
+  if (item_left >= left && item_right < left + width) {
+    // Selection is within the visible area. No need for scrolling
+    // Do nothing
+  } else if (item_right >= left + width) {
+    // Current selection is to the right of the visible area. Need to scroll visible area to the left
+    left += item_right - (left + width - 1);
+    sel->items_str_left = left;
+  } else {
+    // Need to scroll visible area to the right
+    left -= (left - sel->items_start_idx[selected]);
+    sel->items_str_left = left;
+  }
+
+  char ch = sel->items_str[left];
+  if (ch != *left_brace) {
+    wnd_print(wnd, left == 0 ? " " : "-");
+    wnd_printn(wnd, sel->items_str + left + 1, width - 1);
+  } else {
+    wnd_printn(wnd, sel->items_str + left, width);
+  }
 }
 
-static void draw_select_field(form_select_t* sel, bool has_focus)
+static void draw_select_field(form_select_t* sel, uint8_t width, bool has_focus)
 {
   if (!has_focus) {
-    sel->first = *sel->selected;
     wnd_print(wnd, " ");
     wnd_print(wnd, sel->items[*sel->selected]);
     wnd_clear_eol(wnd);
     return;
   }
-  draw_select_field_items(sel);
+  draw_select_field_items(sel, width);
 }
 
 static void redraw_form_item(form_t* form, uint8_t n, form_item_t* item, bool has_focus)
@@ -105,7 +111,7 @@ static void redraw_form_item(form_t* form, uint8_t n, form_item_t* item, bool ha
     draw_checkbox_field(&item->u.checkbox, has_focus);
     break;
   case FORM_TYPE_SELECT:
-    draw_select_field(&item->u.select, has_focus);
+    draw_select_field(&item->u.select, form->col3_width, has_focus);
     break;
   default:
     // Skip
@@ -116,14 +122,6 @@ static void redraw_form_item(form_t* form, uint8_t n, form_item_t* item, bool ha
 static void redraw_form(form_t* form) {
   int n = form->top_row;
   form_item_t* items = form->form_items;
-
-  if (left_brace == NULL) {
-    left_brace = is_m3() ? "[" : "<";
-  }
-
-  if (right_brace == NULL) {
-    right_brace = is_m3() ? "]" : ">";
-  }
 
   while (items->type != FORM_TYPE_END) {
     redraw_form_item(form, n, items, false);
@@ -175,27 +173,41 @@ static bool handle_key_for_checkbox(form_t* form, uint8_t n, char key, form_chec
   return dirty;
 }
 
+static void select_set_focus(form_select_t* sel, uint8_t n)
+{
+  uint8_t from = sel->current;
+  uint8_t to = n;
+
+  sel->items_str[sel->items_start_idx[from]] = ' ';
+  sel->items_str[sel->items_end_idx[from]] = ' ';
+  sel->items_str[sel->items_start_idx[to]] = *left_brace;
+  sel->items_str[sel->items_end_idx[to]] = *right_brace;
+
+  *sel->selected = (sel->first + to) % sel->num_items;
+}
+
 static bool handle_key_for_select(form_t* form, uint8_t n, char key, form_select_t* sel)
 {
   bool dirty;
-  uint8_t selected = *sel->selected;
+  uint8_t selected = sel->current;
   
   if (key == ' ' || key == KEY_RIGHT) {
-    selected++;
-    if (sel->items[selected] == NULL) {
-      selected = 0;
+    if ((selected + 1) != sel->num_items) {
+      selected++;
     }
   }
   if (key == KEY_LEFT) {
-    if (selected == 0) {
-      while (sel->items[++selected] != NULL) ;
+    if (selected != 0) {
+      selected--;
     }
-    selected--;
   }
-  dirty = *sel->selected != selected;
-  *sel->selected = selected;
-  wnd_goto(wnd, form->col3, n);
-  draw_select_field(sel, true);
+  dirty = sel->current != selected;
+  if (dirty) {
+    select_set_focus(sel, selected);
+    sel->current = selected;
+    wnd_goto(wnd, form->col3, n);
+    draw_select_field(sel, form->col3_width, true);
+  }
   return dirty;
 }
 
@@ -221,6 +233,48 @@ static void handle_key(form_t* form, uint8_t n, char key, form_item_t* item)
   }
 }
 
+static void init_select(form_select_t* sel)
+{
+  uint8_t n, count;
+  uint8_t i = 0;
+
+  sel->first = *sel->selected;
+  sel->current = 0;
+  sel->items_str_left = 0;
+
+  n = sel->first;
+  count = 0;
+
+  do {
+    if (count == SELECTION_MAX_ITEMS ||
+        sel->items[n] == NULL ||
+        strlen(sel->items[n]) + i + 4 >= SELECTION_MAX_LEN) {
+      break;
+    }
+    if (i != 0) {
+      sel->items_str[i++] = ' ';
+    }
+    sel->items_start_idx[count] = i;
+    sel->items_str[i++] = ' ';
+    uint8_t k = 0;
+    while (sel->items[n][k] != '\0') {
+      sel->items_str[i++] = sel->items[n][k++];
+    }
+    sel->items_end_idx[count] = i;
+    sel->items_str[i++] = ' ';
+    n++;
+    count++;
+    if (sel->items[n] == NULL) {
+      n = 0;
+    }
+  } while(n != sel->first);
+
+  sel->items_str[i] = '\0';
+  sel->num_items = count;
+
+  select_set_focus(sel, 0);
+}
+
 static char do_input(form_t* form, bool show_from_left)
 {
   uint8_t i = 0;
@@ -239,6 +293,9 @@ static char do_input(form_t* form, bool show_from_left)
   while(true) {
     redraw_form(form);
     field = &items[i];
+    if (field->type == FORM_TYPE_SELECT) {
+      init_select(&field->u.select);
+    }
     while(true) {
       bool redraw = false;
       if (i != last_i) {
@@ -293,12 +350,27 @@ static void compute_form_layout(form_t* form)
   form_item_t* items;
   uint8_t num_form_items;
 
+  if (left_brace == NULL) {
+    left_brace = is_m3() ? "[" : "<";
+  }
+
+  if (right_brace == NULL) {
+    right_brace = is_m3() ? "]" : ">";
+  }
+
   items = form->form_items;
   form->top_row = wnd_get_y(wnd);
 
   num_form_items = 0;
   
   while (items->type != FORM_TYPE_END) {
+    if (items->type == FORM_TYPE_SELECT) {
+      form_select_t* sel = &items->u.select;
+      if (sel->items_ptr != NULL) {
+        sel->items = *sel->items_ptr;
+      }
+    }
+
     items->dirty = false;
     num_form_items++;
     if (items->type == FORM_TYPE_HEADER) {
@@ -313,6 +385,7 @@ static void compute_form_layout(form_t* form)
   form->col1 = has_header ? 2 : 0;
   form->col3 = has_header ? max + 4 : max + 2;
   form->col2 = form->col3 - 2;
+  form->col3_width = wnd->w - form->col3;
 }
 
 static void draw_form(form_t* form)

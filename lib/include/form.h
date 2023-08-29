@@ -23,7 +23,8 @@
 #define FORM_ITEM_END { .type = FORM_TYPE_END }
 
 #define FORM_ITEM_CHECKBOX(l, c, d)	{ .type = FORM_TYPE_CHECKBOX, .label = l, .dirty = d, .u = {.checkbox = {.checked = c}}}
-#define FORM_ITEM_SELECT(l, sel, it, d) { .type = FORM_TYPE_SELECT, .label = l, .dirty = d, .u = {.select = {.first = 0, .selected = sel, .items = it}}}
+#define FORM_ITEM_SELECT(l, sel, it, d) { .type = FORM_TYPE_SELECT, .label = l, .dirty = d, .u = {.select = {.selected = sel, .items = it, .items_ptr = NULL}}}
+#define FORM_ITEM_SELECT_PTR(l, sel, itp, d) { .type = FORM_TYPE_SELECT, .label = l, .dirty = d, .u = {.select = {.selected = sel, .items = NULL, .items_ptr = itp}}}
 #define FORM_ITEM_INPUT(l, b, n, w, d) { .type = FORM_TYPE_INPUT, .label = l, .dirty = d, .u = { .input = {.buf = b, .len = n, .width = w }}}
 
 struct _form_t;
@@ -38,10 +39,21 @@ typedef struct {
   bool* checked;
 } form_checkbox_t;
 
+#define SELECTION_MAX_LEN 256
+#define SELECTION_MAX_ITEMS 20
+
 typedef struct {
-  int8_t first; // Used internally. Not a parameter
   uint8_t* selected;
   const char** items;
+  const char*** items_ptr;
+  // Internal
+  uint8_t first;
+  uint8_t current;
+  uint8_t items_str_left;
+  uint8_t num_items;
+  char items_str[SELECTION_MAX_LEN];
+  uint8_t items_start_idx[SELECTION_MAX_ITEMS];
+  uint8_t items_end_idx[SELECTION_MAX_ITEMS];
 } form_select_t;
 
 typedef struct {
@@ -64,6 +76,7 @@ typedef struct _form_t {
   uint8_t col1;
   uint8_t col2;
   uint8_t col3;
+  uint8_t col3_width;
 } form_t;
 
 uint8_t form(form_t* form, bool show_from_left);

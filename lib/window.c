@@ -164,6 +164,21 @@ void wnd_cls(window_t* wnd) {
   window_screen_update(wnd);
 }  
 
+void wnd_printn(window_t* wnd, char* p, uint16_t n)
+{
+  uint16_t x;
+
+  uint8_t* from = get_screen_pos(wnd);
+  uint8_t* to = from;
+  for (x = 0; x < n; x++) {
+    if (*p == '\0') {
+      break;
+    }
+    *to++ = *p++;
+  }
+  screen_update_range(from, to);
+}
+
 void wnd_clear_eol(window_t* wnd)
 {
   uint8_t x;

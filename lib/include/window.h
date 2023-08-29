@@ -21,6 +21,7 @@ void wnd_set_clip_window(window_t* wnd, bool flag);
 void wnd_print_str(window_t* wnd, const char* str);
 void wnd_print(window_t* wnd, const char* fmt, ...);
 void wnd_cls(window_t* wnd);
+void wnd_printn(window_t* wnd, char* p, uint16_t n);
 void wnd_clear_eol(window_t* wnd);
 void wnd_scroll_down(window_t* wnd);
 void wnd_scroll_up(window_t* wnd);
