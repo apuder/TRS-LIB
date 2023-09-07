@@ -11,6 +11,9 @@
 #define FS_COMMAND_READ     3
 #define FS_COMMAND_CLOSE    4
 
+#ifndef FRESULT_DEFINED
+#define FRESULT_DEFINED
+
 typedef enum {
     FR_OK = 0,				/* (0) Succeeded */
     FR_DISK_ERR,			/* (1) A hard error occurred in the low level disk I/O layer */
@@ -42,6 +45,8 @@ typedef enum {
 #define	FA_CREATE_ALWAYS	0x08
 #define	FA_OPEN_ALWAYS		0x10
 #define	FA_OPEN_APPEND		0x30
+
+#endif
 
 const char* trs_fs_get_error(int error);
 int8_t trs_fs_open(const char* path, uint8_t mode);
