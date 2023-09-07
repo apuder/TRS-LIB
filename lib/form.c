@@ -371,7 +371,9 @@ static void compute_form_layout(form_t* form)
       }
     }
 
-    items->dirty = false;
+    if (items->dirty != NULL) {
+      *items->dirty = false;
+    }
     num_form_items++;
     if (items->type == FORM_TYPE_HEADER) {
       has_header = true;
