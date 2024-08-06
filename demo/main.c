@@ -27,8 +27,6 @@ int main() {
   bool show_from_left = false;
   uint8_t status;
   
-  init_trs_lib();
-
   while(true) {
     status = menu(&main_menu, show_from_left, true);
     if (status == MENU_ABORT || status == MENU_EXIT) {
@@ -50,8 +48,6 @@ int main() {
     }
     show_from_left = true;
   }
-
-  exit_trs_lib();
 
   return 0;
 }

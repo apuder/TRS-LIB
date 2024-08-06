@@ -25,6 +25,7 @@ typedef struct {
 
 extern SCREEN screen;
 
+bool did_use_animation();
 void set_screen(uint8_t* screen_base,
                 uint8_t* background,
                 uint8_t width, uint8_t height,

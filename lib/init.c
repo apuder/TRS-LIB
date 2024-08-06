@@ -50,7 +50,9 @@ void exit_trs_lib()
     // Reset BREAK key on M1
     POKE(0x400c, break_key);
   }
-  set_screen_to_background();
-  memmove(screen.current, screen_original_content, SCREEN_WIDTH * SCREEN_HEIGHT);
-  screen_show(true);
+  if (did_use_animation()) {
+    set_screen_to_background();
+    memmove(screen.current, screen_original_content, SCREEN_WIDTH * SCREEN_HEIGHT);
+    screen_show(true);
+  }
 }

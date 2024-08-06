@@ -28,6 +28,8 @@
 
 	.module crt0
 	.globl	_main
+	.globl	_init_trs_lib
+	.globl	_exit_trs_lib
 	.globl  l__DATA
 	.globl  s__DATA
 	.globl  l__INITIALIZER
@@ -59,7 +61,9 @@ cont1:
 
 	;; Initialise global variables
 	call	gsinit
+	call	_init_trs_lib
 	call	_main
+	call	_exit_trs_lib
 	push	hl
 	pop	de
 	ld	sp,(sp_save)

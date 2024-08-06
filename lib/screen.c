@@ -6,6 +6,12 @@ static const uint8_t scroll_increment = 5;
 
 SCREEN screen;
 
+static bool used_animation = false;
+
+bool did_use_animation()
+{
+  return used_animation;
+}
 
 void screen_update_full()
 {
@@ -102,6 +108,7 @@ static void screen_show_from_left() {
 }
       
 void screen_show(bool from_left) {
+  used_animation = true;
   set_screen_to_foreground();
   if (from_left) {
     screen_show_from_left();
