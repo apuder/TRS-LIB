@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+char print_buf[160];
 
 static uint8_t* get_screen_pos0(window_t* wnd, uint8_t x, uint8_t y) {
   return (screen.current + (wnd->y + y) * screen.width +
@@ -128,18 +129,13 @@ void wnd_print_str(window_t* wnd, const char* str) {
 } 
 
 void wnd_print(window_t* wnd, const char* fmt, ...) {
-  const char* start_of_word;
-  uint8_t len;
-  uint8_t* p, from;
   va_list argp;
-  static char buf[160];
-  char* str;
 
   va_start(argp, fmt);
-  vsprintf(buf, fmt, argp);
+  vsprintf(print_buf, fmt, argp);
   va_end(argp);
 
-  wnd_print_str(wnd, buf);
+  wnd_print_str(wnd, print_buf);
 }
 
 static void window_screen_update(window_t* wnd)
