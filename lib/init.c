@@ -42,6 +42,8 @@ void init_trs_lib()
     screen.is_uc = PEEK(SCREEN_BASE) != 96;
     POKE(SCREEN_BASE, ch);
   }
+
+  init_dos();
 }
 
 void exit_trs_lib()

@@ -8,6 +8,7 @@ ASFLAGS = -l
 OBJS = \
 	init.rel \
 	dos.rel \
+	dos_util.rel \
 	screen.rel \
 	window.rel \
 	form.rel \

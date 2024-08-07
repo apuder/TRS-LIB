@@ -23,10 +23,9 @@ static menu_t main_menu = {
 };
 
 
-int main() {
+int main(const char* args) {
   bool show_from_left = false;
   uint8_t status;
-  
   while(true) {
     status = menu(&main_menu, show_from_left, true);
     if (status == MENU_ABORT || status == MENU_EXIT) {

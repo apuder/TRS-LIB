@@ -37,6 +37,7 @@
 	.globl  s__INITIALIZED
 
 init:
+	ex	de,hl  ; Move args pointer to de
 	;; For M4, turn on MIII memory map. NOP on a M1/III
 	xor	a
 	out	(0x84), a
@@ -60,8 +61,21 @@ cont1:
 	ld	sp,hl
 
 	;; Initialise global variables
+	push	de
 	call	gsinit
 	call	_init_trs_lib
+	pop	hl
+	push	hl
+	pop	de
+cont2:        ; Convert \n to \0
+	ld	a,(de)
+	cp	#0x0d
+	jr	z,cont3
+	inc	de
+	jr	cont2
+cont3:
+	xor	a
+	ld	(de),a
 	call	_main
 	call	_exit_trs_lib
 	push	hl

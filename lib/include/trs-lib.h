@@ -20,6 +20,7 @@ extern "C" {
 #include "trs-nic.h"
 #include "trs-fs.h"
 #include "panic.h"
+#include "dos.h"
 
 #ifdef __cplusplus
 }
