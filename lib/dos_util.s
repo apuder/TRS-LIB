@@ -6,6 +6,10 @@
 CPM         .equ     0
 TRSDOS      .equ     1
 
+  .globl  exit
+  .globl  abort
+  .globl  error
+
 ;; Model I/III addresses
 __fspec  .equ 0x441c
 __init   .equ 0x4420
@@ -46,7 +50,7 @@ open:	call __open
 	ret
 close:	call __close
 	ret
-reed:	call __read
+read:	call __read
 	ret
 write:	call __write
 	ret
@@ -60,6 +64,8 @@ abort:	call __abort
 ;	ret
 ;setern:	call setern5
 ;	ret
+getern:	call __getern5
+	ret
 endj:
 
 ; Model 4
@@ -96,6 +102,8 @@ startj6:
 ;	ret
 ;	call setern6
 ;	ret
+	call __getern6
+	ret
 
 ; Nonzero for LDOS ern convention
 ernldos: .db 1
@@ -120,6 +128,39 @@ not4:
 gotid:  ld (ernldos), a
   ret
 
+;; EOF handling differs between TRS-80 DOSes:
+;;  For TRSDOS 2.3 and LDOS, word (dcb+12) contains the number of
+;;  256 byte records in the file, byte (dcb+8) contains the EOF
+;;  offset in the last record (0=256).
+;;  For NEWDOS/80 and TRSDOS 1.3, byte (dcb+8) and word (dcb+12) 
+;;  form a 24 bit number containing the relative byte address of EOF.
+;;  Thus (dcb+12) differs by one if the file length is not a
+;;  multiple of 256 bytes.  DOSPLUS also uses this convention,
+;;  and NEWDOS 2.1 probably does too (not checked).
+
+; Input: IX: pointer to FCB
+; Returns number of (partial or full) records in DE, destroys A
+__getern5:
+	ld e,12(ix)
+	ld d,13(ix)
+	ld a,(ernldos)         ; get ERN convention
+	and a
+	ret nz                  ; done if TRSDOS 2.3/LDOS convention
+	ld a,8(ix)		; length multiple of 256 bytes?
+	and a
+	ret z                   ; done if so
+	inc de			; no, # of records = last full record + 1
+	ret	
+
+; All Model 4 mode operating systems should be TRSDOS/LS-DOS 6.x compatible
+__getern6:
+	ld e,12(ix)
+	ld d,13(ix)
+	ret
+
+;--------------------------------------------------------------------
+; @fspec
+;--------------------------------------------------------------------
   .globl _dos_fspec
 _dos_fspec:
   push hl
@@ -130,6 +171,9 @@ _dos_fspec:
   xor a
   ret
 
+;--------------------------------------------------------------------
+; @open
+;--------------------------------------------------------------------
   .globl _dos_open
 _dos_open:
   push ix
@@ -138,6 +182,49 @@ _dos_open:
   ld b,4(ix)
   ex de,hl
   call open
+  ex de,hl
+  pop ix
+  pop hl
+  inc sp
+  jp (hl)
+
+;--------------------------------------------------------------------
+; @init
+;--------------------------------------------------------------------
+  .globl _dos_init
+_dos_init:
+  push ix
+  ld ix,#0
+  add ix,sp
+  ld b,4(ix)
+  ex de,hl
+  call init
+  ex de,hl
+  pop ix
+  pop hl
+  inc sp
+  jp (hl)
+
+;--------------------------------------------------------------------
+; getern
+;--------------------------------------------------------------------
+  .globl _dos_getern
+_dos_getern:
+  push ix
+  push hl
+  pop ix
+  call getern
+  pop ix
+  ret
+
+;--------------------------------------------------------------------
+; @read
+;--------------------------------------------------------------------
+  .globl _dos_read
+_dos_read:
+  push ix
+  ex de,hl
+  call read
   ex de,hl
   pop ix
   ret

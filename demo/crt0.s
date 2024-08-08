@@ -30,6 +30,9 @@
 	.globl	_main
 	.globl	_init_trs_lib
 	.globl	_exit_trs_lib
+  .globl  exit
+  .globl  abort
+  .globl  error
 	.globl  l__DATA
 	.globl  s__DATA
 	.globl  l__INITIALIZER
@@ -76,16 +79,19 @@ cont2:        ; Convert \n to \0
 cont3:
 	xor	a
 	ld	(de),a
+  push de      ; Remember location
 	call	_main
+  pop hl
+  ld (hl),#0x0d
+  push de      ; Remember return code from main()
 	call	_exit_trs_lib
-	push	hl
-	pop	de
+	pop	hl
 	ld	sp,(sp_save)
-	ld	a,e
-	or	d
+	ld	a,l
+	or	h
 	jr	z,ok
-	jp	0x4030
-ok:	jp	0x402d
+	jp	abort
+ok:	jp	exit
 
 sp_save:
 	.dw	0
