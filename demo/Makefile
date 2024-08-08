@@ -7,9 +7,9 @@ FORM_OBJS = \
 	demo-trs-fs.rel \
 	demo-form.rel
 
-IMPORT_OBJS = \
+HEXDUMP_OBJS = \
 	crt0.rel \
-	import.rel
+	hexdump.rel
 
 TRS_LIB = ../lib/trs-lib.lib
 
@@ -30,13 +30,13 @@ LDFLAGS = -mjwx -b _CODE=0x5200 -l $(TRS_LIB) -l $(SDCC_PATH)/lib/z80/z80.lib
 %.cmd: %.ihx
 	$(IHEX2CMD) $< $@
 
-all: demo.cmd import.cmd
+all: demo.cmd hexdump.cmd
 
 demo.ihx: $(FORM_OBJS) $(TRS_LIB) Makefile
 	$(LD) $(LDFLAGS) -i demo.ihx $(FORM_OBJS)
 
-import.ihx: $(IMPORT_OBJS) $(TRS_LIB) Makefile
-	$(LD) $(LDFLAGS) -i import.ihx $(IMPORT_OBJS)
+hexdump.ihx: $(HEXDUMP_OBJS) $(TRS_LIB) Makefile
+	$(LD) $(LDFLAGS) -i hexdump.ihx $(HEXDUMP_OBJS)
 
 
 clean:
