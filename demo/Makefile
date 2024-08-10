@@ -11,6 +11,10 @@ HEXDUMP_OBJS = \
 	crt0.rel \
 	hexdump.rel
 
+LS_OBJS = \
+	crt0.rel \
+	ls.rel
+
 TRS_LIB = ../lib/trs-lib.lib
 
 CC = sdcc
@@ -30,13 +34,16 @@ LDFLAGS = -mjwx -b _CODE=0x5200 -l $(TRS_LIB) -l $(SDCC_PATH)/lib/z80/z80.lib
 %.cmd: %.ihx
 	$(IHEX2CMD) $< $@
 
-all: demo.cmd hexdump.cmd
+all: demo.cmd hexdump.cmd ls.cmd
 
 demo.ihx: $(FORM_OBJS) $(TRS_LIB) Makefile
 	$(LD) $(LDFLAGS) -i demo.ihx $(FORM_OBJS)
 
 hexdump.ihx: $(HEXDUMP_OBJS) $(TRS_LIB) Makefile
 	$(LD) $(LDFLAGS) -i hexdump.ihx $(HEXDUMP_OBJS)
+
+ls.ihx: $(LS_OBJS) $(TRS_LIB) Makefile
+	$(LD) $(LDFLAGS) -i ls.ihx $(LS_OBJS)
 
 
 clean:

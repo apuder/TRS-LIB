@@ -17,6 +17,7 @@ __open   .equ 0x4424
 __close  .equ 0x4428
 __read   .equ 0x4436
 __write  .equ 0x4439
+__ramdir .equ 0x4290
 __error  .equ 0x4409
 __exit   .equ 0x402d
 __abort  .equ 0x4030       
@@ -31,6 +32,7 @@ __open6	.equ 59
 __close6	.equ 60
 __read6	.equ 67
 __write6	.equ 75
+__ramdir6 .equ 35
 __error6	.equ 26
 __exit6	.equ 22
 __abort6	.equ 21
@@ -53,7 +55,9 @@ close:	call __close
 read:	call __read
 	ret
 write:	call __write
-	ret
+  ret
+ramdir: call __ramdir
+  ret
 error:	call __error
 	ret
 exit:	call __exit
@@ -86,6 +90,9 @@ startj6:
 	rst __svc
 	ret
 	ld a,#__write6
+	rst __svc
+	ret
+	ld a,#__ramdir6
 	rst __svc
 	ret
 	ld a,#__error6
@@ -239,3 +246,16 @@ _dos_close:
   ex de,hl
   ret
 
+;--------------------------------------------------------------------
+; @ramdir
+;--------------------------------------------------------------------
+  .globl _dos_ramdir
+_dos_ramdir:
+  pop de
+  ld c,a
+  ld b,l
+  pop hl
+  push de
+  call ramdir
+  pop hl
+  jp (hl)
