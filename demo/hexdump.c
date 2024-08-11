@@ -1,5 +1,6 @@
 
 #include <dos.h>
+#include <stdio.h>
 
 
 static uint16_t addr = 0;
@@ -10,7 +11,7 @@ static uint8_t cnt = 0;
 
 static void usage()
 {
-  print("Usage: HEXDUMP <file>\n");
+  printf("Usage: HEXDUMP <file>\n");
 }
 
 static void show()
@@ -18,18 +19,18 @@ static void show()
   if (cnt == 0) {
     return;
   }
-  print("%04X: ", addr);
+  printf("%04X: ", addr);
   for (int i = 0; i < cnt; i++) {
-    print("%02X ", buf[i]);
+    printf("%02X ", buf[i]);
   }
   for (int i = 0; i < SIZE_BUF - cnt; i++) {
-    print("   ");
+    printf("   ");
   }
   for (int i = 0; i < cnt; i++) {
     char ch = buf[i];
-    print("%c", (ch < ' ') ? '.' : ch);
+    printf("%c", (ch < ' ') ? '.' : ch);
   }
-  print("\n");
+  printf("\n");
   addr += cnt;
   cnt = 0;
 }
@@ -54,7 +55,7 @@ int main(const char* args)
   }
   err = dos_open(&fcb, &buffer, 0);
   if (err != 0 && err != ERR_LRL) {
-    print("File not found\n");
+    printf("File not found\n");
     return -1;
   }
 
