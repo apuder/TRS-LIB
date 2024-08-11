@@ -66,8 +66,8 @@ abort:	call __abort
 	ret
 ;dsply:	call dsply5
 ;	ret
-;setern:	call setern5
-;	ret
+setern:	call __setern5
+	ret
 getern:	call __getern5
 	ret
 endj:
@@ -107,8 +107,8 @@ startj6:
 ;	ld a,#__dsply6
 ;	rst __svc
 ;	ret
-;	call setern6
-;	ret
+  call __setern6
+  ret
 	call __getern6
 	ret
 
@@ -163,6 +163,37 @@ __getern5:
 __getern6:
 	ld e,12(ix)
 	ld d,13(ix)
+	ret
+
+; Set ending record number of file to current position
+; Input: IX: pointer to FCB
+;         C: EOF offset
+; Destroys A
+__setern5:
+  push hl
+	ld l,10(ix)		; current record number
+  ld h,11(ix)
+	ld a, (ernldos)         ; get ERN convention
+	or a
+	jr nz, noadj            ; go if TRSDOS 2.3/LDOS convention
+adj:
+  or c			; length multiple of 256 bytes?
+	jr z, noadj             ; go if so
+	dec hl			; no, # of records - 1
+noadj:
+  ld 12(ix),l
+  ld 13(ix),h
+  pop hl
+	ret	
+
+; All Model 4 mode operating systems should be TRSDOS/LS-DOS 6.x compatible
+__setern6:
+  push hl
+	ld l,10(ix)
+  ld h,11(ix)
+	ld 12(ix),l
+  ld 13(ix),h
+  pop hl
 	ret
 
 ;--------------------------------------------------------------------
@@ -221,6 +252,18 @@ _dos_getern:
   push hl
   pop ix
   call getern
+  pop ix
+  ret
+
+;--------------------------------------------------------------------
+; setern
+;--------------------------------------------------------------------
+  .globl _dos_setern
+_dos_setern:
+  push ix
+  push hl
+  pop ix
+  call setern
   pop ix
   ret
 
