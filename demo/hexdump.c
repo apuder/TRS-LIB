@@ -1,11 +1,13 @@
 
 #include <dos.h>
+#include <key.h>
 #include <stdio.h>
 
 
 static uint16_t addr = 0;
 static uint8_t buf[8];
 static uint8_t cnt = 0;
+static uint8_t line_cnt = 0;
 
 #define SIZE_BUF sizeof(buf)
 
@@ -14,10 +16,21 @@ static void usage()
   printf("Usage: HEXDUMP <file>\n");
 }
 
-static void show()
+static bool next_line()
+{
+  char ch = 0;
+  if (line_cnt++ == 15) {
+    ch = get_key();
+    line_cnt = 0;
+  }
+  printf("\n");
+  return ch == KEY_BREAK;
+}
+
+static bool show()
 {
   if (cnt == 0) {
-    return;
+    return false;
   }
   printf("%04X: ", addr);
   for (int i = 0; i < cnt; i++) {
@@ -28,19 +41,20 @@ static void show()
   }
   for (int i = 0; i < cnt; i++) {
     char ch = buf[i];
-    printf("%c", (ch < ' ') ? '.' : ch);
+    printf("%c", (ch < ' ' || ch >= 192) ? '.' : ch);
   }
-  printf("\n");
   addr += cnt;
   cnt = 0;
+  return next_line();
 }
 
-static void dump(uint8_t b)
+static bool dump(uint8_t b)
 {
   buf[cnt++] = b;
   if (cnt == SIZE_BUF) {
-    show();
+    return show();
   }
+  return false;
 }
 
 int main(const char* args)
@@ -60,6 +74,7 @@ int main(const char* args)
   }
 
   uint16_t ern = dos_getern(&fcb);
+  bool abort = false;
 
   do {
     ern--;
@@ -72,10 +87,18 @@ int main(const char* args)
       count = 256;
     }
     for (int i = 0; i < count; i++) {
-      dump(buffer[i]);
+      abort = dump(buffer[i]);
+      if (abort) {
+        break;
+      }
+    }
+    if (abort) {
+      break;
     }
   } while(ern != 0);
-  show();
+  if (!abort) {
+    show();
+  }
 
   dos_close(&fcb);
 

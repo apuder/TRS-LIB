@@ -1,12 +1,25 @@
 
 #include <dos.h>
+#include <key.h>
 #include <stdio.h>
 
 static dir_buf_t dir_buf;
+static uint8_t line_cnt = 0;
 
 static void usage()
 {
   printf("Usage: LS [0-7]\n");
+}
+
+static bool next_line()
+{
+  char ch = 0;
+  if (line_cnt++ == 15) {
+    ch = get_key();
+    line_cnt = 0;
+  }
+  printf("\n");
+  return ch == KEY_BREAK;
 }
 
 int main(const char* args)
@@ -29,7 +42,10 @@ int main(const char* args)
     dir_t* d = &dir_buf[i];
     uint16_t lrl = (d->lrl == 0) ? 256 : d->lrl;
     uint16_t size = lrl * (d->lst_sec - 1) + d->eof;
-    printf("%.15s  %6d\n", d->fname, size);
+    printf("%.15s  %6d", d->fname, size);
+    if (next_line()) {
+      break;
+    }
     i++;
   }
 
