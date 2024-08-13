@@ -37,6 +37,7 @@ err_t dos_init(fcb_t* fcb, buffer_t* buffer, uint8_t lrl);
 uint16_t dos_getern(fcb_t* fcb);
 void dos_setern(fcb_t* fcb);
 err_t dos_read(fcb_t* fcb, urec_t* urec);
+err_t dos_write(fcb_t* fcb, urec_t* urec);
 err_t dos_close(fcb_t* fcb);
 err_t dos_ramdir(uint8_t dec, uint8_t drive, dir_buf_t* buffer);
 void init_dos();

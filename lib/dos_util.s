@@ -167,7 +167,6 @@ __getern6:
 
 ; Set ending record number of file to current position
 ; Input: IX: pointer to FCB
-;         C: EOF offset
 ; Destroys A
 __setern5:
   push hl
@@ -177,6 +176,7 @@ __setern5:
 	or a
 	jr nz, noadj            ; go if TRSDOS 2.3/LDOS convention
 adj:
+  ld c,8(ix)
   or c			; length multiple of 256 bytes?
 	jr z, noadj             ; go if so
 	dec hl			; no, # of records - 1
@@ -280,7 +280,19 @@ _dos_read:
   ret
 
 ;--------------------------------------------------------------------
-; close
+; @write
+;--------------------------------------------------------------------
+  .globl _dos_write
+_dos_write:
+  push ix
+  ex de,hl
+  call write
+  ex de,hl
+  pop ix
+  ret
+
+;--------------------------------------------------------------------
+; @close
 ;--------------------------------------------------------------------
   .globl _dos_close
 _dos_close:
