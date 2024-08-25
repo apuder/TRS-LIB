@@ -21,7 +21,7 @@ typedef struct {
   uint8_t    prot_level;
   uint8_t    eof;
   uint8_t    lrl;
-  uint16_t   lst_sec;
+  uint16_t   ern;
   uint16_t   ngran;
 } dir_t;
 

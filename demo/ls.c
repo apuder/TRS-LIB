@@ -41,7 +41,11 @@ int main(const char* args)
   while (dir_buf[i].fname[0] != '+') {
     dir_t* d = &dir_buf[i];
     uint16_t lrl = (d->lrl == 0) ? 256 : d->lrl;
-    uint16_t size = lrl * (d->lst_sec - 1) + d->eof;
+    uint16_t n = d->ern;
+    if (d->eof != 0) {
+      n--;
+    }
+    uint16_t size = lrl * n + d->eof;
     printf("%.15s  %6d", d->fname, size);
     if (next_line()) {
       break;
