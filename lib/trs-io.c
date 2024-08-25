@@ -12,13 +12,18 @@ bool is_m3()
   return *((volatile uint8_t*) 0x125) == 'I';
 }
 
-void wait_for_esp()
+bool is_esp_done()
 {
   if (is_m3()) {
-    while (PORT_0xE0 & 8) ;
+    return !(PORT_0xE0 & 8);
   } else {
-    while (*((uint8_t*) 0x37e0) & 0x20) ;
+    return !(*((uint8_t*) 0x37e0) & 0x20);
   }
+}
+
+void wait_for_esp()
+{
+  while (!is_esp_done()) ;
 }
 
 uint8_t trs_io_status()

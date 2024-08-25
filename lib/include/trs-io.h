@@ -25,6 +25,7 @@ extern int16_t trs_io_err;
 
 bool is_m3();
 void wait_for_esp();
+bool is_esp_done();
 uint8_t trs_io_status();
 void trs_io_version(uint8_t* revision, uint16_t* version);
 void trs_io_set_led(bool r, bool g, bool b, bool blink, bool auto_off);
