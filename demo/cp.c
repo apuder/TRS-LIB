@@ -70,10 +70,9 @@ int main(char* args)
 
   uint16_t ern = dos_getern(&from_fcb);
 
-  do {
-    ern--;
+  while (ern-- != 0) {
     err = dos_read(&from_fcb, NULL);
-    if (err == ERR_EOF) {
+    if (err != NO_ERR) {
       break;
     }
     err = dos_write(&to_fcb, NULL);
@@ -81,7 +80,7 @@ int main(char* args)
       printf("Write err: %d\n", err);
       break;
     }
-  } while(ern != 0);
+  }
 
   // Copy EOF
   to_fcb.fname[8] = from_fcb.fname[8];

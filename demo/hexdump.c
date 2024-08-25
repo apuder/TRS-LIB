@@ -76,10 +76,9 @@ int main(const char* args)
   uint16_t ern = dos_getern(&fcb);
   bool abort = false;
 
-  do {
-    ern--;
+  while (ern-- != 0) {
     err = dos_read(&fcb, NULL);
-    if (err == ERR_EOF) {
+    if (err != NO_ERR) {
       break;
     }
     uint16_t count = (ern == 0) ? fcb.fname[8] : 256;
@@ -95,7 +94,8 @@ int main(const char* args)
     if (abort) {
       break;
     }
-  } while(ern != 0);
+  }
+
   if (!abort) {
     show();
   }
