@@ -60,14 +60,14 @@ static bool dump(uint8_t b)
 int main(const char* args)
 {
   fcb_t fcb;
-  buffer_t buffer;
+  sector_t sector;
 
-  err_t err = dos_fspec(args, &fcb);
+  dos_err_t err = dos_fspec(args, &fcb);
   if (err != NO_ERR) {
     usage();
     return -1;
   }
-  err = dos_open(&fcb, &buffer, 0);
+  err = dos_open(&fcb, &sector, 0);
   if (err != 0 && err != ERR_LRL) {
     printf("File not found\n");
     return -1;
@@ -86,7 +86,7 @@ int main(const char* args)
       count = 256;
     }
     for (int i = 0; i < count; i++) {
-      abort = dump(buffer[i]);
+      abort = dump(sector[i]);
       if (abort) {
         break;
       }

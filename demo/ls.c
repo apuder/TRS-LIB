@@ -30,7 +30,7 @@ int main(const char* args)
     return -1;
   }
 
-  err_t err = dos_ramdir(0, drive, &dir_buf);
+  dos_err_t err = dos_ramdir(0, drive, &dir_buf);
   if (err != NO_ERR) {
     printf("Error: %d\n", err);
     return -1;
