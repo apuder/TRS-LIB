@@ -19,6 +19,10 @@ CP_OBJS = \
 	crt0.rel \
 	cp.rel
 
+REMOVE_OBJS = \
+  crt0.rel \
+	remove.rel
+
 TRS_LIB = ../lib/trs-lib.lib
 
 CC = sdcc
@@ -38,7 +42,7 @@ LDFLAGS = -mjwx -b _CODE=0x5200 -l $(TRS_LIB) -l $(SDCC_PATH)/lib/z80/z80.lib
 %.cmd: %.ihx
 	$(IHEX2CMD) $< $@
 
-all: demo.cmd hexdump.cmd ls.cmd cp.cmd
+all: demo.cmd hexdump.cmd ls.cmd cp.cmd remove.cmd
 
 demo.ihx: $(FORM_OBJS) $(TRS_LIB) Makefile
 	$(LD) $(LDFLAGS) -i demo.ihx $(FORM_OBJS)
@@ -51,6 +55,9 @@ ls.ihx: $(LS_OBJS) $(TRS_LIB) Makefile
 
 cp.ihx: $(CP_OBJS) $(TRS_LIB) Makefile
 	$(LD) $(LDFLAGS) -i cp.ihx $(CP_OBJS)
+
+remove.ihx: $(REMOVE_OBJS) $(TRS_LIB) Makefile
+	$(LD) $(LDFLAGS) -i remove.ihx $(REMOVE_OBJS)
 
 
 clean:
