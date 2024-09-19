@@ -5,6 +5,7 @@
 #include "defs.h"
 
 #define NO_ERR 0
+#define ERR_ILLEGAL_FILENAME 19
 #define ERR_EOF 28
 #define ERR_REC_OUT_OF_RANGE 29
 #define ERR_LRL 42
