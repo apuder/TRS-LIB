@@ -42,6 +42,7 @@ dos_err_t dos_write(fcb_t* fcb, urec_t* urec);
 dos_err_t dos_close(fcb_t* fcb);
 dos_err_t dos_ramdir(uint8_t dec, uint8_t drive, dir_buf_t* buffer);
 dos_err_t dos_remove(fcb_t* fcb);
+dos_err_t dos_rename(const char* old, const char* new);
 void init_dos();
 
 #endif

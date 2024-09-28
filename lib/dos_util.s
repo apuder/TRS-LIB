@@ -9,6 +9,7 @@ TRSDOS      .equ     1
   .globl  exit
   .globl  abort
   .globl  error
+  .globl  __renam
 
 ;; Model I/III addresses
 __fspec  .equ 0x441c
@@ -35,6 +36,7 @@ __read6	.equ 67
 __write6	.equ 75
 __ramdir6 .equ 35
 __remov6 .equ 57
+__renam6 .equ 56
 __error6	.equ 26
 __exit6	.equ 22
 __abort6	.equ 21
@@ -61,6 +63,8 @@ write:	call __write
 ramdir: call __ramdir
   ret
 remov: call __remov
+  ret
+renam: call __renam
   ret
 error:	call __error
 	ret
@@ -100,6 +104,9 @@ startj6:
 	rst __svc
 	ret
 	ld a,#__remov6
+	rst __svc
+	ret
+	ld a,#__renam6
 	rst __svc
 	ret
 	ld a,#__error6
@@ -329,5 +336,15 @@ _dos_ramdir:
 _dos_remove:
   ex de,hl
   call remov
+  ex de,hl
+  ret
+
+;--------------------------------------------------------------------
+; @renam
+;--------------------------------------------------------------------
+  .globl _dos_rename
+_dos_rename:
+  ex de,hl
+  call renam
   ex de,hl
   ret

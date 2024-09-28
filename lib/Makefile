@@ -9,6 +9,7 @@ OBJS = \
 	init.rel \
 	dos.rel \
 	dos_util.rel \
+	rename.rel \
 	screen.rel \
 	window.rel \
 	form.rel \
