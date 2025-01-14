@@ -33,7 +33,10 @@ void init_trs_lib()
   if (!is_m3()) {
     // Enable BREAK key on L2/DOS
     break_key = PEEK(0x400c);
-    POKE(0x400c, 0xc9);
+    // test if it has a call in place model 1 ldos seames to use it for overlay loading?
+    if (break_key != 0xc3){
+      POKE(0x400c, 0xc9);
+    }
     
     // Determine if the screen has lowercase by writing/reading screen memory.
     // An unmodified M1 will read back 32 instead of 96.
