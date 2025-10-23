@@ -18,13 +18,14 @@ __open   .equ 0x4424
 __close  .equ 0x4428
 __read   .equ 0x4436
 __write  .equ 0x4439
-__ramdir .equ 0x4290
+__ramdir .equ 0x4290 ; 0x4396 model 1
 __remov  .equ 0x442c
 __error  .equ 0x4409
 __exit   .equ 0x402d
 __abort  .equ 0x4030       
 __put	  .equ 0x001b
 dodcb$	.equ 0x401d
+__ramdir1 .equ 0x4396
 
 ;; Model 4 SVCs
 __svc	  .equ 40  ; rst address for SVCs
@@ -128,8 +129,10 @@ startj6:
 
 ; Nonzero for LDOS ern convention
 ernldos: .db 1
+model1: .db 1
+model1t .equ 0x0125
 
-  .globl _init_dos
+ .globl _init_dos
 _init_dos: 
 	ld a, (0x000a)		; Model 4?
 	cp #0x40
@@ -141,6 +144,10 @@ _init_dos:
 	ldir
 	pop hl
 not4:
+	ld a,(model1t)
+	sub #'I'
+	ld (model1), a		; check for the third I in model 3 
+	jr nz, gotm1
 	ld a, (0x4427)		; system id for Newdos/80...
 	sub #0x82			; ...should be 82h (v2.0)
 	jr z, gotid
@@ -148,6 +155,29 @@ not4:
 	sub #0x13			; TRSDOS 1.3?
 gotid:  ld (ernldos), a
   ret
+  
+gotm1:
+	ld a, (0x4427)		; system id for Newdos/80...
+	sub #0x82			; ...should be 82h (v2.0)
+	jr z, gotid
+	ld a, (0x403E)		; system version number  ; 0x403e model 1 ldos
+	sub #0x13			; TRSDOS 1.3?
+	jr z, gotid
+	ld a, (0x403E)
+	and #0x50			; check for ldos 5.x
+	cp #0x50
+	jr nz, gotid			; not ldos 5.x
+	push af
+	ld a, (0x000a)		; Model 4?
+	cp #0x40
+	jr nz, not1_3
+	push hl
+	ld hl, #__ramdir1
+	ld (#ramdir + 1) , hl	; change the ramdir for model 1 
+	pop hl
+not1_3:
+	pop af
+	jr gotid
 
 ;; EOF handling differs between TRS-80 DOSes:
 ;;  For TRSDOS 2.3 and LDOS, word (dcb+12) contains the number of
